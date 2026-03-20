@@ -1,0 +1,63 @@
+gLAB version v6.0.0 Release Candidate 2, built on Jun 30 2020 19:32:15
+GNSS LABORATORY. Tool to analyse GNSS data
+Write 'gLAB -help' for help on the options
+Usage:
+    gLAB [options]
+
+  CONFIG FILE
+
+    - The config file can be specified by the '-input:cfg <file>' command-line parameter. This file is an alternative
+       way to configure the behaviour of the tool. In case that there are parameters in the config file and in the
+       command-line arguments, the command-line parameters will have priority over the config file ones.
+
+    - The order to read the parameters is:
+
+           o Check if the '-input:cfg' parameter exist in the command-line arguments
+           o If it exists, parse config file parameters
+           o Parse command-line parameters
+
+    - The config file is basically a mirror of the command-line parameters. The only difference is that in the configuration
+       file only one parameter is provided by line.
+       For example, for the parameters '-input:obs upc42000_10s.06o' and '-filter:select G0-PC12 G0-LC12', the config file shall be:
+
+           -input:obs upc42000_10s.06o
+           -filter:select G0-PC12 G0-LC12
+
+    - There can be any number of spaces between parameters and the arguments. For instance, the example above can also be written as:
+
+           -input:obs     upc42000_10s.06o
+             -filter:select              G0-PC12 G0-LC12
+
+    - Arguments of parameters which contain filenames (with or without pathes) can contain spaces in their filenames. If there is only one
+        argument (one file), it is optional to write the filename between quotes (single or double). If there are multiple arguments or files
+        and the filenames have spaces, it is compulsory to set them between quotes (single or double), as otherwise it would be impossible to
+        disguish a space character being part of the filename or being a separator between arguments. Furthermore, it is possible to add the
+        quote character inside the filename, by preceeding it with a backslash ('\'). The delimiter quotes will be removed from the
+        filename internally in gLAB.
+
+    - All lines beginning with the hash symbol ('#') in the config file shall be interpreted as a comment, and ignored in the parsing process.
+
+    - Blank lines are ignored.
+
+    - Comments -starting with the hash symbol ('#')- next to the options are allowed (since version 5.2.0). There is no need to set a
+       space character between the end of the parameter or argument and the hash symbol ('#').
+
+  SAMPLE CONFIG FILE
+
+        # INPUT
+        -input:obs madr2000.06o
+        -input:nav brdc2000.06n "Glo Nav file 200.06g"
+        -input:antsatblock igs_pre1400.atx
+
+        # PREPROCESS
+        -pre:elevation 5 
+
+        # FILTER
+        -filter:prefitoutliers:median 30#Set the prefit outlier detector threshold to 30 metres
+
+        # OUTPUT
+        -print:all  #This parameter enables all output messages
+
+    This config file is equivalent to the following command line execution:
+
+        ./gLAB_linux -input:obs madr2000.06o -input:nav brdc2000.06n "Glo Nav file 200.06g" -input:antsatblock igs_pre1400.atx -pre:elevation 5 -filter:prefitoutliers:median 30 -print:all

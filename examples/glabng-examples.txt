@@ -1,0 +1,95 @@
+gLAB version v6.0.0 Release Candidate 2, built on Jun 30 2020 19:32:15
+GNSS LABORATORY. Tool to analyse GNSS data
+Write './gLAB_linux -help' for help on the options
+
+Usage:
+    ./gLAB_linux [options]
+
+Examples:
+    o Typical PPP:
+        ./gLAB_linux -input:obs madr2000.06o -input:sp3 igs13843.sp3 -input:ant igs_pre1400.atx -filter:meas carrierphase -filter:nav static
+
+    o Same as before using the defaults:
+        ./gLAB_linux -input:obs madr2000.06o -input:sp3 igs13843.sp3 -input:ant igs_pre1400.atx
+
+    o Typical SPP with all constellations:
+        ./gLAB_linux -input:obs madr2000.06o -input:nav brdc2000.06n
+
+    o Typical SPP with GPS and Galileo only (two ways):
+        ./gLAB_linux -input:obs madr2000.06o -input:nav brdc2000.06n -pre:sat 0,+GE0
+        ./gLAB_linux -input:obs madr2000.06o -input:nav brdc2000.06n -pre:sat -RSJCI0
+
+    o SPP using GPS only, with L1 in all satellites except for PRNs 1,3,5,6,7,8 and 9, which will use L5 (two possible ways):
+        ./gLAB_linux -input:obs madr2000.06o -input:nav brdc2000.06n -filter:select G2.4.10-32-code-1 G1.3.5-9-code-5
+        ./gLAB_linux -input:obs madr2000.06o -input:nav brdc2000.06n -filter:select G0-code-1 -G1.3.5-9-code-1 G1.3.5-9-code-5
+
+    o SPP using smoothed code in frequency 1 for GPS, Galileo, GLONASS, QZSS, in frequency 2 for Beidou and frequency 5 for IRNSS and GEO disabled:
+        ./gLAB_linux -input:obs madr2000.06o -input:nav brdc2000.06n -pre:sat -S0 -filter:select GERJ0-code-1 C0-code-2 I0-code-5 -pre:smoothmeas GERJ0-code-1 phase-1 C0-code-2 phase-2 I0-code-5 phase-5
+
+    o PPP in static mode with pseudorange only decimating to 900 seconds:
+        ./gLAB_linux -input:obs madr2000.06o -input:sp3 igs13843.sp3 -input:ant igs_pre1400.atx -filter:meas pseudorange -filter:nav static -pre:dec 900
+
+    o Typical PPP without INFO messages:
+        ./gLAB_linux -input:obs madr2000.06o -input:sp3 igs13843.sp3 -input:ant igs_pre1400.atx --print:info
+
+    o Typical PPP with some verbose options:
+        ./gLAB_linux -input:obs madr2000.06o -input:sp3 igs13843.sp3 -input:ant igs_pre1400.atx -print:none -print:cycleslips -print:model -print:satellites
+
+    o PPP using ionosphere-free code and phase combinations with frequencies 15 for for GPS, Galileo, QZSS, frequencies 12 for GLONASS, frequencies 27 in Beidou and frequencies 59 for IRNSS:
+        ./gLAB_linux -input:obs madr2000.06o -input:sp3 igs13843.sp3 -input:ant igs_pre1400.atx -pre:sat -S0 -filter:select GRJ0-PC15 GER0-LC15 R0-PC12 R0-LC12 C0-PC27 C0-LC27 I0-PC59 I0-LC59
+
+    o Typical standalone using standard ionospheric model (Klobuchar) and not using it
+        ./gLAB_linux -input:obs madr2000.06o -input:nav brdc2000.06n -filter:nav kinematic
+        ./gLAB_linux -model:iono no -input:obs madr2000.06o -input:nav brdc2000.06n -filter:nav kinematic
+
+    o Typical standalone using SBAS 1F ionosphere (without any other SBAS correction)
+        ./gLAB_linux -input:obs madr2000.06o -input:nav brdc2000.06n -input:sbasiono M1202000.06b -model:iono SBAS
+
+    o Standard SBAS 1F processing:
+        ./gLAB_linux -input:obs madr2000.06o -input:nav brdc2000.06n -input:sbas1f M1202000.06b
+
+    o Standard SBAS 1F processing with file conversion to Pegasus format:
+        ./gLAB_linux -input:obs madr2000.06o -input:nav brdc2000.06n -input:sbas1f M1202000.06b -output:pegasus
+
+    o Standard SBAS DFMC processing with one navigation file (including GPS and Galileo):
+        ./gLAB_linux -input:obs madr2000.06o -input:nav brdc2000.06p -input:sbasdfmc M1202000.06b
+
+    o Standard SBAS DFMC processing with two navigation files (for GPS and Galileo):
+        ./gLAB_linux -input:obs madr2000.06o -input:nav brdc2000.06n brdc2000.06l -input:sbasdfmc M1202000.06b
+
+    o Standard SBAS DFMC processing with one navigation file (including GPS and Galileo) for Autralian SBAS DFMC testbed:
+        ./gLAB_linux -input:obs madr2000.06o -input:nav brdc2000.06p -input:sbasdfmc M1202000.06b -model:sbasdfmc:austestbed
+
+    o Standard DGNSS processing:
+        ./gLAB_linux -input:obs madr2000.06o -input:nav brdc2000.06n -input:rtcm rtcm2000.06rtcm2 -input:rtcm:initdate 20060718 -input:rtcm:inithour 00
+
+    o Convert RINEX-B file to ems and Pegasus format and exit without processing:
+        ./gLAB_linux -input:sbas1f M1202000.06b -output:ems -output:pegasus -onlyconvert
+
+    o Convert EMS file to Pegasus format (with columns aligned and the output files in current directory) and exit without processing:
+        ./gLAB_linux -input:sbas1f M1202000.ems -output:pegasus -output:pegfilealign -output:sbasdir "." -onlyconvert
+
+    o Convert RTCM file to plain text ASCII or RINEX format:
+        ./gLAB_linux -input:rtcm rtcm2000.06rtcm2 -input:rtcm:initdate 20060718 -input:rtcm:inithour 00
+
+    o Save output to a file:
+        ./gLAB_linux [options] > outputfile
+        ./gLAB_linux [options] -output:file outputfile
+
+    o Print only INPUT messages without any decimation, do not process (no -input:sp3 nor -input:nav nor -input:orb/-input:clk):
+        ./gLAB_linux -input:obs madr2000.06o -pre:dec 0 -print:none -print:input
+
+    o Compute SBAS 1F plots with the default configuration (EGNOS region):
+        ./gLAB_linux -input:nav brdc2000.06n -input:sbas1f M1202000.06b
+
+    o Compute SBAS 1F plots specifying the region and output file:
+        ./gLAB_linux -input:nav brdc2000.06n -input:sbas1f M1202000.06b -sbasplots:minlat 25 -sbasplots:maxlat 70 -sbasplots:minlon -30 -sbasplots:maxlon 40 -output:sbasplots SBASplots_120_200_2016
+
+    o Compute SBAS 1F plots specifying the resolution, vertical and horizontal alarm limits and resolution for availability and ionosphere plots:
+        ./gLAB_linux -input:nav brdc2000.06n -input:sbas1f M1202000.06b -sbasplots:hal 30 -sbasplots:val 35 -sbasplots:availstep 1 -sbasplots:ionostep 1
+
+    o Compute SBAS DFMC plots with the default configuration (EGNOS region):
+        ./gLAB_linux -input:nav brdc2000.06p -input:sbasdfmc M1202000.06b
+
+    o Add user error to RINEX file:
+        ./gLAB_linux -input:obs madr2000.06o -input:usererror added_error_file.txt > Observation_RINEX_with_added_error.txt
